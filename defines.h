@@ -9,8 +9,8 @@
 #define defines_h
 
 
-#define LOOPLEDPORT     PORTA
-#define LOOPLEDDDR      DDRA
+#define LOOPLEDPORT     PORTB
+#define LOOPLEDDDR      DDRB
 #define LOOPLED         7 // 
 
 #define INT0_RISING      0
@@ -20,10 +20,10 @@
 #define SHORT 0 // Abstand im doppelpaket
 #define LONG 2 // Abstand zwischen Daten
 
-#define OSZIPORT  PORTB      // Ausgang fuer Servo
-#define OSZIDDR   DDRB
+#define OSZIPORT  PORTA      // Ausgang fuer OSZI
+#define OSZIDDR   DDRA
 
-#define OSZIA 1           // 
+#define OSZIA 7           // 
 
 
 #define PAKETA   0
@@ -34,28 +34,37 @@
 #define OSZIATOG OSZIPORT ^= (1<<OSZIA)
 
 
-#define TESTPORT        PORTB
+#define TESTPORT       PORTB
 #define TESTDDR        DDRB
 
 #define TEST0     0
 #define TEST1     1
-#define TEST2     2
 
 
 
 
-#define MOTORPORT   PORTA
-#define MOTORDDR    DDRA
-#define MOTORPIN    PINA
+
+#define MOTORPORT   PORTB
+#define MOTORDDR    DDRB
+#define MOTORPIN    PINB
 
 //PINS
 
-#define MOTORDIR      0
-#define MOTOROUT      1
+#define MOTORA      0
+#define MOTORB      1
 #define LAMPE         2
 #define MOTORAUX      3
 
 
+#define DEVPORT   PORTA
+#define DEVDDR    DDRA
+#define DEVPIN    PINA
+
+#define LAMPA  2
+#define LAMPB  3
+
+#define DIR    1
+#define AUX    0
 
 
 // Bits

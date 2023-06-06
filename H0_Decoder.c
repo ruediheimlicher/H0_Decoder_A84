@@ -44,10 +44,10 @@ uint8_t  LOK_ADRESSE = 0xCC; //	11001100	Trinär
 
 //#define OUTPORT	PORTD		// Ausgang fuer Motor
 
-//#define INPORT   PORTD  // Input signal auf INT0
-//#define INPIN   PIND  // Input signal
+#define INPORT   PORTB  // Input signal auf INT0
+#define INPIN   PINB  // Input signal
 
-#define DATAPIN  2 
+#define DATAPIN  2 // PB2
 
 
 
@@ -160,21 +160,21 @@ volatile uint8_t   speedlookup[15] = {0,26,30,34,38,42,46,51,55,59,63,67,71,75,8
 volatile uint8_t   maxspeed =  252;
 
 volatile uint8_t   lastDIR =  0;
-uint8_t loopledtakt = 0x2F;
+uint8_t loopledtakt = 0x1F;
 
 void slaveinit(void)
 {
  	OSZIPORT |= (1<<OSZIA);	//Ausgang fuer OSZI A
 	OSZIDDR |= (1<<OSZIA);	//Ausgang fuer OSZI A
 
-   LOOPLEDDDR |=(1<<LOOPLED); // HI
-   LOOPLEDPORT |=(1<<LOOPLED);
+//   LOOPLEDDDR |=(1<<LOOPLED); // HI
+ //  LOOPLEDPORT |=(1<<LOOPLED);
 
   DDRA= 0xFF;
     /*
     MOTORDDR |= (1<<MOTORAUX);  // MOTORAUX als Output
-   MOTORDDR |= (1<<MOTOROUT);  // Output Motor PWM   
-   MOTORPORT |= (1<<MOTOROUT); // HI, Motor OFF
+   MOTORDDR |= (1<<MOTORB);  // Output Motor PWM   
+   MOTORPORT |= (1<<MOTORB); // HI, Motor OFF
 
    MOTORDDR |= (1<<LAMPE);  // Lampe
    MOTORPORT |= (1<<LAMPE); // HI
@@ -299,9 +299,9 @@ ISR(INT0_vect)
 }
 
 #pragma mark ISR Timer2
-ISR(TIM0_COMPA_vect) // Schaltet Impuls an MOTOROUT LO wenn speed
+ISR(TIM0_COMPA_vect) // Schaltet Impuls an MOTORB LO wenn speed
 {
-   OSZIATOG;
+   //OSZIATOG;
    //return;
    if (speed)
    {
@@ -309,13 +309,13 @@ ISR(TIM0_COMPA_vect) // Schaltet Impuls an MOTOROUT LO wenn speed
    }
    if ((motorPWM > speed) || (speed == 0)) // Impulszeit abgelaufen oder speed ist 0
    {
-      MOTORPORT |= (1<<MOTOROUT); // OFF, Motor ist active LO
+      MOTORPORT |= (1<<MOTORB); // OFF, Motor ist active LO
    
    }
    
    if (motorPWM >= 254) //ON, neuer Motorimpuls
    {
-      MOTORPORT &= ~(1<<MOTOROUT);
+      MOTORPORT &= ~(1<<MOTORB);
       motorPWM = 0;
    }
    
@@ -488,7 +488,7 @@ ISR(TIM0_COMPA_vect) // Schaltet Impuls an MOTOROUT LO wenn speed
                            lokstatus |= (1<<RICHTUNGBIT);
                            richtungcounter = 0xFF;
                            speed = 0;
-                           MOTORPORT ^= (1<<MOTORDIR); // Richtung umpolen
+                           MOTORPORT ^= (1<<MOTORA); // Richtung umpolen
                            
                         }
                      }
@@ -627,18 +627,18 @@ void main (void)
    //WDT ausschalten 
    MCUSR = 0;
    wdt_disable();
-   MOTORDDR |= (1<<MOTORDIR);  // Output Motor PWM  
+   MOTORDDR |= (1<<MOTORA);  // Output Motor PWM  
    MOTORDDR &= ~(1<<MOTORAUX);  // Input, AUX, Sniffer fuer DIR nach reset
    if (MOTORPIN & (1<<MOTORAUX)) // AUX ist noch HI
    {
       lastDIR = 1;
-      MOTORPORT |= (1<<MOTORDIR); 
+      MOTORPORT |= (1<<MOTORA); 
       //loopledtakt = 0x1FFF;
    }
    else 
    {
       lastDIR = 0;
-      MOTORPORT &= ~(1<<MOTORDIR);
+      MOTORPORT &= ~(1<<MOTORA);
      // loopledtakt = 0x0FFF;
    }
 //   lastDIR = 1;
@@ -706,7 +706,7 @@ void main (void)
          loopcount1++;
          if (loopcount1 >= loopledtakt)
          {
-            LOOPLEDPORT ^= (1<<LOOPLED); // Kontrolle lastDIR
+           // LOOPLEDPORT ^= (1<<LOOPLED); // Kontrolle lastDIR
             loopcount1 = 0;
             // wdt-delay, fuer test
             wdtcounter++;
@@ -715,6 +715,7 @@ void main (void)
                wdtcounter=0;
  //              _delay_ms(1000);
             }
+            OSZIATOG;
          }
          
       }
